@@ -3,10 +3,17 @@ const asyncHandler = require("express-async-handler");
 
 const CategoryModel = require("../models/categoryModel");
 
-exports.getCategories = (req, res) => {
-  res.send();
-};
+// @desc Get List Of Categories
+// @route GET /api/v1/categories
+// @acess Public
+exports.getAllCategories = asyncHandler(async (req, res) => {
+  const categories = await CategoryModel.find();
+  res.status(200).json({ results: categories.length, data: categories });
+});
 
+// @desc Create Category
+// @route POST /api/v1/categories
+// @acess Private
 exports.createCategory = asyncHandler(async (req, res) => {
   const name = req.body.name;
 
