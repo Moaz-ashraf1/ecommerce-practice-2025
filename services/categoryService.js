@@ -2,6 +2,7 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 
 const CategoryModel = require("../models/categoryModel");
+const AppError = require("../utilis/AppError");
 
 // @desc Get List Of Categories
 // @route GET /api/v1/categories
@@ -27,12 +28,12 @@ exports.createCategory = asyncHandler(async (req, res) => {
 // @desc Get Specific Category By Id
 // @route GET /api/v1/categories/id
 // @acess Public
-exports.getCategory = asyncHandler(async (req, res) => {
+exports.getCategory = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
 
   const category = await CategoryModel.findById(id);
   if (!category) {
-    res.status(404).json({ msg: `No Category For This Id ${id}` });
+    return next(new AppError(`No Category For This Id ${id}`, 404));
   }
   res.status(201).json({ category });
 });
@@ -40,7 +41,7 @@ exports.getCategory = asyncHandler(async (req, res) => {
 // @desc Update Specific Category
 // @route GET /api/v1/categories/id
 // @acess Private
-exports.updateCategory = asyncHandler(async (req, res) => {
+exports.updateCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
   const category = await CategoryModel.findOneAndUpdate(
@@ -49,7 +50,7 @@ exports.updateCategory = asyncHandler(async (req, res) => {
     { new: true }
   );
   if (!category) {
-    res.status(404).json({ msg: `No Category For This Id ${id}` });
+    return next(new AppError(`No Category For This Id ${id}`, 404));
   }
   res.status(200).json({ data: category });
 });
@@ -57,11 +58,11 @@ exports.updateCategory = asyncHandler(async (req, res) => {
 // @desc Delete Specific Category
 // @route DELETE /api/v1/categories/id
 // @acess Private
-exports.deleteCategory = asyncHandler(async (req, res) => {
+exports.deleteCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const category = await CategoryModel.findByIdAndDelete(id);
   if (!category) {
-    return res.status(404).json({ msg: `No Category For This Id ${id}` });
+    return next(new AppError(`No Category For This Id ${id}`, 404));
   }
-  res.status(200).json({ data: `${category.name} Category Is Deleted` });
+  res.status(204).json({ data: `${category.name} Category Is Deleted` });
 });
