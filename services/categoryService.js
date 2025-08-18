@@ -2,7 +2,7 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 
 const CategoryModel = require("../models/categoryModel");
-const AppError = require("../utilis/AppError");
+const AppError = require("../utilis/ApiError");
 
 // @desc Get List Of Categories
 // @route GET /api/v1/categories
@@ -19,7 +19,7 @@ exports.getAllCategories = asyncHandler(async (req, res) => {
 // @route POST /api/v1/categories
 // @acess Private
 exports.createCategory = asyncHandler(async (req, res) => {
-  const name = req.body.name;
+  const { name } = req.body;
 
   const category = await CategoryModel.create({ name, slug: slugify(name) });
   res.status(201).json({ data: category });
@@ -29,7 +29,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
 // @route GET /api/v1/categories/id
 // @acess Public
 exports.getCategory = asyncHandler(async (req, res, next) => {
-  const id = req.params.id;
+  const { id } = req.params;
 
   const category = await CategoryModel.findById(id);
   if (!category) {

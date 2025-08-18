@@ -1,15 +1,15 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
-const mongoose = require("mongoose");
 
 dotenv.config({
   path: "config.env",
 });
-const AppError = require("./utilis/AppError");
+const AppError = require("./utilis/ApiError");
 const globalError = require("./middleware/globalError");
 const dbConnection = require("./config/database");
 const categoryRoute = require("./routes/categoryRoute");
+const subcategoryRoute = require("./routes/subCategoryRoute");
 
 // connect with db
 dbConnection();
@@ -18,7 +18,7 @@ dbConnection();
 const app = express();
 
 // Middlewares
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
@@ -27,6 +27,7 @@ app.use(express.json());
 
 // Mount Routes
 app.use("/api/v1/categories", categoryRoute);
+app.use("/api/v1/subcategory", subcategoryRoute);
 
 // Handle Unhandled Routes
 app.use((req, res, next) => {

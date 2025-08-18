@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { type } = require("os");
 
 const subCategorySchema = mongoose.Schema(
   {
@@ -20,7 +19,7 @@ const subCategorySchema = mongoose.Schema(
       required: [true, " SubCategory must be belong to parent category"],
     },
   },
-  { timeStamp: true }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("subCategory", subCategorySchema);
