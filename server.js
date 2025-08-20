@@ -8,8 +8,11 @@ dotenv.config({
 const AppError = require("./utilis/ApiError");
 const globalError = require("./middleware/globalError");
 const dbConnection = require("./config/database");
+
 const categoryRoute = require("./routes/categoryRoute");
 const subcategoryRoute = require("./routes/subCategoryRoute");
+const brandRoute = require("./routes/brandRoute");
+const productRoute = require("./routes/productRoute");
 
 // connect with db
 dbConnection();
@@ -27,7 +30,9 @@ app.use(express.json());
 
 // Mount Routes
 app.use("/api/v1/categories", categoryRoute);
-app.use("/api/v1/subcategory", subcategoryRoute);
+app.use("/api/v1/subcategories", subcategoryRoute);
+app.use("/api/v1/brands", brandRoute);
+app.use("/api/v1/products", productRoute);
 
 // Handle Unhandled Routes
 app.use((req, res, next) => {
