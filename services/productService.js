@@ -2,19 +2,36 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 
 const Product = require("../models/productModel");
-const Category = require("../models/categoryModel");
 const ApiError = require("../utilis/ApiError");
+const parseQuery = require("../utilis/queryParser");
 
 exports.getProducts = asyncHandler(async (req, res, next) => {
+  // 1) filtering
+  const queryStringObject = { ...req.query };
+  const execludeFields = ["page", "limit", "fields", "sort"];
+  execludeFields.forEach((value) => {
+    delete queryStringObject[value];
+  });
+
+  const mongooseQueryObject = parseQuery(queryStringObject);
+
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 5;
   const skip = (page - 1) * limit;
 
-  const products = await Product.find({}).skip(skip).limit(limit).populate({
-    path: "category",
-    select: "name -_id",
-  });
+  let mongooseQueruy = Product.find(mongooseQueryObject)
+    .skip(skip)
+    .limit(limit)
+    .populate({
+      path: "category",
+      select: "name -_id",
+    });
 
+  // if (req.query.sort) {
+  //   console.log(req.query.sort);
+  //   mongooseQueruy = mongooseQueruy.sort(req.query.sort);
+  // }
+  const products = await mongooseQueruy;
   res.status(200).json({ page, results: products.length, data: products });
 });
 
