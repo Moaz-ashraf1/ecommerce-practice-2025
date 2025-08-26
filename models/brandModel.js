@@ -17,6 +17,13 @@ const brandSchema = mongoose.Schema(
   },
   { timeStamps: true }
 );
+brandSchema.post("init", (doc) => {
+  doc.image = `${process.env.BASE_URL}/brands/images/${doc.image}`;
+});
+
+brandSchema.post("save", (doc) => {
+  doc.image = `${process.env.BASE_URL}/brands/images/${doc.image}`;
+});
 
 const brandModel = mongoose.model("Brand", brandSchema);
 module.exports = brandModel;

@@ -22,6 +22,14 @@ const CategorySchema = new mongoose.Schema(
   { timestamps: true } //created At, updated At
 );
 
+CategorySchema.post("init", (doc) => {
+  doc.image = `${process.env.BASE_URL}/categories/images/${doc.image}`;
+});
+
+CategorySchema.post("save", (doc) => {
+  doc.image = `${process.env.BASE_URL}/categories/images/${doc.image}`;
+});
+
 // 2- Create Model
 const CategoryModel = mongoose.model("Category", CategorySchema);
 
