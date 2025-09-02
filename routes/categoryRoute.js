@@ -15,15 +15,18 @@ const {
   getCategoryValidator,
   createCategoryValidator,
   updateCategoryValidator,
-
   deleteCategoryValidator,
 } = require("../utilis/validators/categoryValidators");
+
+const { protect, allowedTo } = require("../services/authService");
 
 const router = express.Router();
 router
   .route("/")
   .get(getAllCategories)
   .post(
+    protect,
+    allowedTo("admin", "manager"),
     uploadCategoryImage,
     resizeImage,
     createCategoryValidator,
@@ -34,12 +37,14 @@ router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
   .put(
+    protect,
+    allowedTo("admin", "manager"),
     uploadCategoryImage,
     resizeImage,
     updateCategoryValidator,
     updateCategory
   )
-  .delete(deleteCategoryValidator, deleteCategory);
+  .delete(protect, allowedTo("admin"), deleteCategoryValidator, deleteCategory);
 
 router.use("/:categoryId/subCategories", subCategoriesRoute);
 

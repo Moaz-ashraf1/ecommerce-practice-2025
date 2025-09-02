@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const multerOptions = () => {
   const multerStorage = multer.memoryStorage({});
+
   const multerFilter = function (req, file, callback) {
     if (file.mimetype.startsWith("image")) {
       callback(null, true);

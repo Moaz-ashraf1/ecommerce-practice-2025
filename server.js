@@ -16,6 +16,9 @@ const categoryRoute = require("./routes/categoryRoute");
 const subcategoryRoute = require("./routes/subCategoryRoute");
 const brandRoute = require("./routes/brandRoute");
 const productRoute = require("./routes/productRoute");
+const userRouter = require("./routes/userRoute");
+const authRouter = require("./routes/authRoute");
+const reviewRoute = require("./routes/reviewRoute");
 
 // connect with db
 dbConnection();
@@ -37,6 +40,9 @@ app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", subcategoryRoute);
 app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/products", productRoute);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/reviews", reviewRoute);
 
 // Handle Unhandled Routes
 app.use((req, res, next) => {

@@ -6,6 +6,31 @@ exports.getBrandValidator = [
   check("id").isMongoId().withMessage(`Invalid Brand Id Format`),
   validatorMiddleware,
 ];
+exports.createReviewValidator = [
+  check("title").optional(),
+  check("ratings")
+    .notEmpty()
+    .withMessage(`ratings value required`)
+    .isFloat({
+      min: 1,
+      max: 5,
+    })
+    .withMessage(`ratings value must be between 1.0 and 5.0`),
+  check("user").isMongoId().withMessage(`Invalid User Id Format`),
+  check("product")
+    .isMongoId()
+    .withMessage(`Invalid Product Id Format`)
+    .custom(async (value, { req }) => {
+      const review = await Review.findOne({
+        user: req.user._id,
+        product: value,
+      });
+      if (review) {
+        throw new Error(`You already created a review before`);
+      }
+    }),
+  validatorMiddleware,
+];
 
 exports.createBrandValidator = [
   check("name")

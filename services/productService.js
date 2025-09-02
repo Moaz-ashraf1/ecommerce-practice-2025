@@ -54,7 +54,7 @@ exports.resizeProductImage = asyncHandler(async (req, res, next) => {
   next();
 });
 
-exports.getProduct = factory.getOne(Product);
+exports.getProduct = factory.getOne(Product, { path: "reviews" });
 
 exports.getProducts = factory.getAll(Product);
 
@@ -63,19 +63,3 @@ exports.createProduct = factory.createOne(Product);
 exports.updateProduct = factory.updateOne(Product);
 
 exports.deleteProduct = factory.deleteOne(Product);
-
-/*
-{
-    "title": "Menss Cotton Jacket",
-    "slug": "mens-cotton-jacket",
-    "quantity": 20,
-    "sold": 75,
-    "price": 55.99,
-    "description": "great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.",
-    "category": "68a00f1f4d928d6bd5e7f680",
-
-    "imageCover": "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
-    "ratingsAverage": 4.0,
-    "ratingsQuantity": 70
-  }
-*/

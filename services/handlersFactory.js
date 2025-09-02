@@ -29,10 +29,13 @@ exports.getAll = (model) =>
       .json({ results: documents.length, paginationResult, data: documents });
   });
 
-exports.getOne = (model) =>
+exports.getOne = (model, populateOptions) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const document = await model.findById(id);
+    const query = model.findById(id);
+    console.log(populateOptions);
+    if (populateOptions) query.populate(populateOptions);
+    const document = await query;
 
     if (!document) {
       return next(new ApiError(`No document For This Id ${id}`, 404));
@@ -61,7 +64,7 @@ exports.updateOne = (model) =>
       req.body,
       { new: true }
     );
-    console.log(document);
+
     if (!document) {
       return next(
         new ApiError(`No Document For This Id ${req.params.id}`, 404)

@@ -19,22 +19,33 @@ const {
   resizeProductImage,
 } = require("../services/productService");
 
-router.route("/").get(getProducts).post(
-  uplodProductImage,
+const reviewRoute = require("./reviewRoute");
 
-  resizeProductImage,
-  createProductValidator,
-  createProduct
-);
+const { protect, allowedTo } = require("../services/authService");
+
+router.use("/:productId/reviews", reviewRoute);
+router
+  .route("/")
+  .get(getProducts)
+  .post(
+    protect,
+    allowedTo("admin", "manager"),
+    uplodProductImage,
+    resizeProductImage,
+    createProductValidator,
+    createProduct
+  );
 router
   .route("/:id")
   .get(getProductValidator, getProduct)
   .put(
+    protect,
+    allowedTo("admin", "manager"),
     uplodProductImage,
     resizeProductImage,
     updateProductValidator,
     updateProduct
   )
-  .delete(deleteProductValidator, deleteProduct);
+  .delete(protect, allowedTo("admin"), deleteProductValidator, deleteProduct);
 
 module.exports = router;
