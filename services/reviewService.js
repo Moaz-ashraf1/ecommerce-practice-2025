@@ -15,6 +15,7 @@ exports.setProductIdToBody = (req, res, next) => {
   if (req.params.productId) req.body.product = req.params.productId;
   next();
 };
+
 exports.createReview = asyncHandler(async (req, res, next) => {
   console.log(req.params.productId);
 

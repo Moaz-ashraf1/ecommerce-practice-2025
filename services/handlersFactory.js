@@ -51,7 +51,7 @@ exports.deleteOne = (model) =>
     if (!document) {
       return next(new ApiError(`No document For This Id ${id}`, 404));
     }
-
+    await document.deleteOne();
     res.status(200).send();
   });
 
@@ -70,5 +70,8 @@ exports.updateOne = (model) =>
         new ApiError(`No Document For This Id ${req.params.id}`, 404)
       );
     }
+
+    await document.save();
+
     res.status(200).json({ document });
   });

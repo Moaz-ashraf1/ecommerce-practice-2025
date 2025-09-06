@@ -21,6 +21,7 @@ exports.createReviewValidator = [
         user: req.user._id,
         product: value,
       });
+
       if (review) {
         throw new Error(`You already created a review before`);
       }
@@ -37,8 +38,8 @@ exports.updateReviewValidator = [
       if (!review) {
         throw new Error(`Review not found`);
       }
-      console.log(req.user._id, review.user);
-      if (req.user._id.toString() !== review.user.toString()) {
+
+      if (req.user._id.toString() !== review.user._id.toString()) {
         throw new Error(`You are not allowed to update this review`);
       }
     }),
@@ -56,7 +57,7 @@ exports.deleteReviewValidator = [
         throw new Error(`Review not found`);
       }
       if (
-        req.user._id.toString() !== review.user.toString() &&
+        req.user._id.toString() !== review.user._id.toString() &&
         req.user.role === "user"
       ) {
         throw new Error(`You are not allowed to delete this review`);
