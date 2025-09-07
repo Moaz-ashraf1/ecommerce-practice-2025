@@ -1,7 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const Cart = require("../models/cartModel");
+const Coupon = require("../models/couponModel");
 const Product = require("../models/productModel");
-const AppError = require("../utilis/ApiError");
+const ApiError = require("../utilis/ApiError");
 
 const calculateTotalCartPrice = (cart) => {
   let totalCartPrice = cart.cartItems.reduce(
@@ -32,26 +33,26 @@ exports.createUserCart = asyncHandler(async (req, res, next) => {
         },
       ],
     });
-  }
-
-  // if cart is found
-  const productIndex = cart.cartItems.findIndex(
-    (item) =>
-      item.product.toString() === req.body.product &&
-      item.color === req.body.color
-  );
-
-  if (productIndex > -1) {
-    // نفس المنتج + نفس اللون → نزود الكمية
-    cart.cartItems[productIndex].quantity += 1;
   } else {
-    // إما المنتج جديد أو نفس المنتج بلون مختلف → نضيف entry جديد
-    cart.cartItems.push({
-      product: product._id,
-      color: req.body.color,
-      price: product.price,
-      quantity: 1,
-    });
+    // if cart is found
+    const productIndex = cart.cartItems.findIndex(
+      (item) =>
+        item.product.toString() === req.body.product &&
+        item.color === req.body.color
+    );
+
+    if (productIndex > -1) {
+      // نفس المنتج + نفس اللون → نزود الكمية
+      cart.cartItems[productIndex].quantity += 1;
+    } else {
+      // إما المنتج جديد أو نفس المنتج بلون مختلف → نضيف entry جديد
+      cart.cartItems.push({
+        product: product._id,
+        color: req.body.color,
+        price: product.price,
+        quantity: 1,
+      });
+    }
   }
 
   // calculate total cart price
@@ -74,7 +75,7 @@ exports.getLoggedUserCart = asyncHandler(async (req, res, next) => {
 
   if (!cart) {
     return next(
-      new AppError(`There is no cart for this user id: ${req.user._id}`, 404)
+      new ApiError(`There is no cart for this user id: ${req.user._id}`, 404)
     );
   }
   res.status(200).json({
@@ -96,7 +97,7 @@ exports.removeProductFromCart = asyncHandler(async (req, res, next) => {
 
   if (!cart) {
     return next(
-      new AppError(`There is no cart for this user id: ${req.user._id}`, 404)
+      new ApiError(`There is no cart for this user id: ${req.user._id}`, 404)
     );
   }
 
@@ -114,8 +115,67 @@ exports.removeProductFromCart = asyncHandler(async (req, res, next) => {
 exports.clearLoggedUserCart = asyncHandler(async (req, res, next) => {
   await Cart.findOneAndDelete({ user: req.user._id });
 
-  res.status(200).json({
+  res.status(204).json({
     status: "success",
     message: "User cart cleared successfully",
+  });
+});
+
+exports.updateCartItemQuantity = asyncHandler(async (req, res, next) => {
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) {
+    return next(
+      new ApiError(`There is no cart for this user id: ${req.user._id}`, 404)
+    );
+  }
+
+  const itemIndex = cart.cartItems.findIndex(
+    (item) => item._id.toString() === req.params.itemId
+  );
+
+  if (itemIndex > -1) {
+    cart.cartItems[itemIndex].quantity += req.body.quantity;
+    cart.totalCartPrice = calculateTotalCartPrice(cart);
+  } else {
+    return next(
+      new ApiError(` There is no item for this id :${req.params.itemId}`, 404)
+    );
+  }
+
+  await cart.save();
+  res.status(200).json({
+    status: "success",
+    data: cart,
+  });
+});
+
+exports.applyCoupon = asyncHandler(async (req, res, next) => {
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) {
+    return next(
+      new ApiError(`There is no cart for this user id: ${req.user._id}`, 404)
+    );
+  }
+
+  const coupon = await Coupon.findOne({
+    name: req.body.coupon,
+    expire: { $gt: Date.now() },
+  });
+  if (!coupon) {
+    return next(new ApiError(`Coupon is invaild or expired`, 404));
+  }
+
+  // apply discount
+  const discount = (cart.totalCartPrice * coupon.discount) / 100;
+  cart.totalCartPriceAfterDiscount = (cart.totalCartPrice - discount).toFixed(
+    2
+  );
+
+  await cart.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Coupon applied successfully",
+    data: cart,
   });
 });

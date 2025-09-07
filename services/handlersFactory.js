@@ -33,7 +33,6 @@ exports.getOne = (model, populateOptions) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const query = model.findById(id);
-    console.log(populateOptions);
     if (populateOptions) query.populate(populateOptions);
     const document = await query;
 
