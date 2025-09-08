@@ -1,3 +1,4 @@
+require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const asyncHandler = require("express-async-handler");
 const Cart = require("../models/cartModel");

@@ -9,6 +9,8 @@ const qs = require("qs");
 dotenv.config({
   path: "config.env",
 });
+
+console.log("Stripe secret is:", process.env.STRIPE_SECRET);
 const AppError = require("./utilis/ApiError");
 const globalError = require("./middleware/globalError");
 const dbConnection = require("./config/database");
