@@ -8,6 +8,7 @@ const {
   filterOrderForLoggeddUser,
   updateOrderToPaid,
   updateOrderToDelivered,
+  checkoutSession,
 } = require("../services/orderService");
 
 const { protect, allowedTo } = require("../services/authService");
@@ -35,4 +36,9 @@ router
 router
   .route("/:id/deliver")
   .put(protect, allowedTo("admin", "manager"), updateOrderToDelivered);
+
+router
+  .route("/checkout/:cartId")
+  .post(protect, allowedTo("user"), checkoutSession);
+
 module.exports = router;
